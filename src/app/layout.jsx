@@ -1,6 +1,7 @@
 import { Nerko_One } from "next/font/google";
 import "./globals.css";
 import Navbar from "./_component/Navbar/page";
+import Provider from "./_component/Provider/Provider";
 
 const nerko_One = Nerko_One({
   subsets: ["latin"],
@@ -19,8 +20,10 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/Image/logo-sm.png" type="image/png" />
       </head>
       <body className={`${nerko_One.className} antialiased bg-[#272b30]`}>
-        <Navbar />
-        {children}
+        <Provider>
+          <Navbar />
+          {children}
+        </Provider>
       </body>
     </html>
   );

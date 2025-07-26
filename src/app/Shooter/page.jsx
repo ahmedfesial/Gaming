@@ -1,36 +1,33 @@
 'use client'
 import axios from 'axios'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { API_Host, API_Key } from '../page'
+import { useQuery } from '@tanstack/react-query'
+
 
 export default function Shooter() {
 
 
-  const [setData, setSetData] = useState([])
-  const [isLoading, setisLoading] = useState(true)
 
   function getShooter(){
-    axios.get(`https://free-to-play-games-database.p.rapidapi.com/api/games?category=shooter` ,
+    return axios.get(`https://free-to-play-games-database.p.rapidapi.com/api/games?category=shooter` ,
       {
         headers : {
-        'x-rapidapi-key': '7433ded128msh63c76a0c0f469f6p1ec4b9jsn27469fb69876',
-        'x-rapidapi-host': 'free-to-play-games-database.p.rapidapi.com'
+        'x-rapidapi-key': API_Key,
+        'x-rapidapi-host': API_Host
       }
       }
      )
-     .then(({data})=>{
-      setSetData(data)
-      setisLoading(false)
-     })
-     .catch((error)=>{
-      setisLoading(false)
-     })
   }
 
 
-  useEffect(()=>{
-    getShooter()
-  },[])
+  const {data , isLoading , isError , error} = useQuery({
+    queryKey : ['shooter'],
+    queryFn : getShooter,
+    select : (data)=> data.data
+  })
+
 
   if(isLoading){
         return <div className="min-h-96 flex items-center justify-center my-12">
@@ -38,13 +35,21 @@ export default function Shooter() {
         </div>
     }
 
+   if(isError){
+    return (
+      <div className="text-center text-2xl text-white mt-40">
+        <h1>{error.response?.data?.message}</h1>
+      </div>  
+    )
+  }  
+
 
   return <>
     <div className="container mx-auto flex flex-wrap mt-15 text-white px-2">
-  {setData.map((card) => (
+  {data.map((card) => (
     <div
       key={card.id}
-      className="w-full sm:w-1/2 md:w-1/3 xl:w-1/4 p-2"
+      className="w-1/2 md:w-1/3 xl:w-1/4 p-2"
     >
       <Link href={`/GameDetails/${card.id}`}>
         <div className="px-4 border border-[#717477] rounded-lg hover:scale-105 transition-transform duration-300 h-full">
@@ -69,13 +74,13 @@ export default function Shooter() {
               {card.genre}
             </h1>
             <h1 className="bg-[#32383e] px-2 py-1 text-xs rounded-lg">
-              {card.platform}
+              {card.platform.split(' ').slice(0,2).join(' ')}
             </h1>
           </div>
         </div>
       </Link>
     </div>
   ))}
-</div>
+    </div>
   </>
 }
